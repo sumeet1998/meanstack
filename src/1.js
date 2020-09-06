@@ -1,31 +1,26 @@
-const Promise = require("bluebird");
-const mysql = require("mysql");
+let Promise = require("bluebird");
+let mysql = require("mysql");
 
 Promise.promisifyAll(require("mysql/lib/Connection").prototype);
 Promise.promisifyAll(require("mysql/lib/Pool").prototype);
 
-const config = {
-    host     : "127.0.0.1",
-  user     : "root",
-  password : "",
-  database : "dac2020",
-};
+const config1 = require("./module1");
 
 let addrecord = async() => {
-  let connection =  mysql.createConnection(config);
+    const connection = mysql.createConnection(config1.config);
 
-  await connection.connectAsync();
+    await connection.connectAsync();
 
-  let sql= "insert into user (username, password, emailid, mobile) values (?,?,?,?)";
-  let addvalue = await connection.queryAsync(sql,[
-    "prathamesh",
-    "1234",
-    "pratham@234",
-    "9456473850",
-  ])
+    let sql = "insert into user (username,password,emailid,mobile) values (?,?,?,?)";
+    let result = await connection.queryAsync(sql,[
+        "rohan",
+        "1234",
+        "rohan@123",
+        "1234567890",
+    ]);
 
-  await connection.endAsync();
-  return addvalue;
+    await connection.endAsync();
+    return result;
 }
 
 addrecord();
