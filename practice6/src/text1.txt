@@ -1,0 +1,7 @@
+let sample = 
+{
+    id: 1,
+    name: "pratham",
+   
+}
+this is a text file.

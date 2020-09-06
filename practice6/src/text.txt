@@ -1,0 +1,7 @@
+ let json = 
+ {
+       id:1,
+       name:"sumeet",
+       city:"pune",
+       state:"maharashtra"
+  }
