@@ -1,33 +1,30 @@
-const Promise = require("bluebird");
-const mysql = require("mysql");
+const express = require("express");
+const app = express();
 
-Promise.promisifyAll(require("mysql/lib/Connection").prototype);
-Promise.promisifyAll(require("mysql/lib/Pool").prototype);
+//In node there is "http" and in express there is "app"
 
-const DB_CONFIG = {
-  host: "127.0.0.1",
-  user: "root",
-  password: "",
-  database: "dac2020",
-};
+app.get("/",(req,res) => {
+    const json = {
+        id:1,
+        name:"sumeet d",
+    } 
+  res.json(json);
 
-let addRecord = async () => {
-  const connection = mysql.createConnection(DB_CONFIG);
-  await connection.connectAsync();
+})
 
-  // LOGIC
-  let sql =
-    "INSERT INTO USER (username, password, emailid, mobile) VALUES (?, ?, ?, ?)";
-  let operation = await connection.queryAsync(sql, [
-    "Sumeet Debadwar",
-    "12345",
-    "sumeet@gmail.com",
-    "3456789012",
-  ]);
+// app.listen(3300);
 
-  await connection.endAsync();
-  return operation;
-};
 
-addRecord();
+app.get("/search",(req,res) => {
+    const id = req.query.id;
+    const name = req.query.name;
 
+    const json = {
+        id:2,
+        name:"pratham",
+    }
+
+    res.json(json);
+})
+
+app.listen(3300);
