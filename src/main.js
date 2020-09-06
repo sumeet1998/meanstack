@@ -1,58 +1,58 @@
-let Promise = require("bluebird");
-let mysql = require("mysql");
-let express = require("express");
+const express = require("express");
+const app = express();
+const cors = require("cors");
+const multer = require("multer");
 
-Promise.promisifyAll(require("mysql/lib/Connection").prototype);
-Promise.promisifyAll(require("mysql/lib/Pool").prototype);
+app.use(express.json()); //parsing the request body of POST
+app.use(cors()); // ajax request
+app.use(express.urlencoded({ extended: true })); // BODY :: URL ENCODED
+const upload = multer(); // BODY :: FORM DATA
 
-let config = require("./module1");
-let dbadd = require("./db.add");
+const dbadd = require("./add.user");
 
-
-let app = express();
-
-app.get("/", async (req,res)=>{
-
-    try{
-    const Username = req.query.Username;
-    const Password = req.query.Password;
-    const Emailid = req.query.Emailid;
-    const Mobile = req.query.Mobile;
-
-
-   
-        let connection = mysql.createConnection(config.db_config);
-
-        await connection.connectAsync();
-
-        let sql = "insert into user (username,password,emailid,mobile) values (?,?,?,?)";
-        await connection.queryasync(sql,[Username,Password,Emailid,Mobile]);
-
-        await connection.endAsync();
-
-        const json = {message : "we are successful"};
-        res.json(json);
-
-    }catch(err){
-        const json = {message:"failure"};
-        res.json(json);
-    }
+app.get("/", (req, res) => {
+  res.send("Hello World");
 });
 
-
-
-app.get("/search",async(req,res)=>{
-
-    try {
+app.get("/adduser", async (req, res) => {
+  try {
     const input = req.query;
-    await dbadd.addrecord(input);
 
-    const json = { message: "Success" };
-    res.json(json);
+    await dbadd.addUser(input);
+
+    res.json({ message: "success" });
   } catch (err) {
-    const json = { message: "Failure" };
-    res.json(json);
+    res.sendStatus(500);
   }
 });
 
-app.listen(3300);
+app.post("/adduser", async (req, res) => {
+  try {
+    const input = req.body;
+
+    await dbadd.addUser(input);
+
+    res.json({ message: "success" });
+  } catch (err) {
+    res.sendStatus(500);
+  }
+});
+
+app.post("/auth-user", async (req, res) => {
+  try {
+    const input = req.body;
+
+    await dbadd.authenticateUser(input);
+    res.json({ opr: true });
+  } catch (err) {
+    res.json({ opr: false });
+  }
+});
+
+app.post("/sample", upload.none(), async (req, res) => {
+  res.json(req.body);
+});
+
+
+
+app.listen(3000);
