@@ -1,30 +1,58 @@
-const express = require("express");
-const app = express();
+let Promise = require("bluebird");
+let mysql = require("mysql");
+let express = require("express");
 
-//In node there is "http" and in express there is "app"
+Promise.promisifyAll(require("mysql/lib/Connection").prototype);
+Promise.promisifyAll(require("mysql/lib/Pool").prototype);
 
-app.get("/",(req,res) => {
-    const json = {
-        id:1,
-        name:"sumeet d",
-    } 
-  res.json(json);
-
-})
-
-// app.listen(3300);
+let config = require("./module1");
+let dbadd = require("./db.add");
 
 
-app.get("/search",(req,res) => {
-    const id = req.query.id;
-    const name = req.query.name;
+let app = express();
 
-    const json = {
-        id:2,
-        name:"pratham",
+app.get("/", async (req,res)=>{
+
+    try{
+    const Username = req.query.Username;
+    const Password = req.query.Password;
+    const Emailid = req.query.Emailid;
+    const Mobile = req.query.Mobile;
+
+
+   
+        let connection = mysql.createConnection(config.db_config);
+
+        await connection.connectAsync();
+
+        let sql = "insert into user (username,password,emailid,mobile) values (?,?,?,?)";
+        await connection.queryasync(sql,[Username,Password,Emailid,Mobile]);
+
+        await connection.endAsync();
+
+        const json = {message : "we are successful"};
+        res.json(json);
+
+    }catch(err){
+        const json = {message:"failure"};
+        res.json(json);
     }
+});
 
+
+
+app.get("/search",async(req,res)=>{
+
+    try {
+    const input = req.query;
+    await dbadd.addrecord(input);
+
+    const json = { message: "Success" };
     res.json(json);
-})
+  } catch (err) {
+    const json = { message: "Failure" };
+    res.json(json);
+  }
+});
 
 app.listen(3300);
